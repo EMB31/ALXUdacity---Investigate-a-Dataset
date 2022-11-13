@@ -141,6 +141,7 @@ del df['SMS_received']
 ```
 
 ## Exploratory Data Analysis
+EDA was performed to answer the questions outlined in the beginning.
 
 ### Are there more cases of no shows against show ups?
 ```
@@ -157,3 +158,108 @@ chart = CntOfNoShowVal.plot(kind = 'pie', figsize = (6,6),label=' ', explode=[0,
 chart.set_title("Ratio of show ups to no shows", weight='bold');
 ```
 ![image](https://user-images.githubusercontent.com/113180085/201522142-e7f322ed-4aef-4614-810c-6d821d973182.png)
+
+### Which location accounts for the most No Shows?
+```
+#create a dataframe for appointments where patient did not show up
+df_missed = df.query('NoShow =="Yes"')
+
+#Count the number of occurrences of each neighbourhood value in the no show dataframe df_noshow 
+#Since I am only interested in the neighbourhood that accounts for the most no shows 
+#I limited the data to the highest 10 values
+NoOfOccurrences = df_missed.groupby('Neighbourhood')['NoShow'].count().nlargest(10)
+
+#plot horizontal bar chart showing number of no shows per neigbourhood 
+NoOfOccurrences.plot(kind='barh', figsize =(10,8), color="#488AC7");
+plt.title("Number of no shows per Neighbourhood",weight ='bold')
+plt.xlabel("Number of no shows", labelpad=15, weight='bold',size=12)
+plt.ylabel("Neighbourhood",labelpad=15, weight='bold',size=12);
+```
+![image](https://user-images.githubusercontent.com/113180085/201522419-34e748b3-03b7-4724-a099-11f1087af25e.png)
+
+### Determine if the Gender, Scholarship status, Age and Patient's condition have any influence on showing up to their appointment
+```
+# Use table containing info on only missed appointment i.e. df_noshow that was created earlier
+# Count the NoShow column values and group by gender
+df_gender_missed = df_missed.groupby('Gender')['NoShow'].count()
+
+# Filter table for only instances where patient showed up
+df_showedup = df.query('NoShow =="No"')
+
+#Count the NoShow column and group by gender
+df_gender_showedup = df_showedup.groupby('Gender')['NoShow'].count()
+
+#To plot the grouped bar chart
+# define the width of the bars
+wth = 0.3
+
+#define the distinct gender labels
+gender =['Female', 'Male']
+
+#Define position of the bars
+bar1_psn=np.arange(len(gender))
+bar2_psn=[i+wth for i in bar1_psn]
+
+#plot the bar charts
+plt.bar(bar1_psn,df_gender_showedup,wth,label="showed up");
+plt.bar(bar2_psn,df_gender_missed,wth,label="missed");
+
+#change the x-axis label to the gender values and position it at the center
+plt.xticks(bar1_psn+wth/2,gender)
+
+#show the legend
+plt.legend();
+
+#add axis labels and title
+plt.title("Appointment attendance per gender",weight ='bold')
+plt.xlabel("Gender", labelpad=15, weight='bold',size=12)
+plt.ylabel("Count of attendance",labelpad=15, weight='bold',size=12);
+```
+![image](https://user-images.githubusercontent.com/113180085/201522576-fec809ee-087c-42ea-b623-daa7e58f50bd.png)
+
+```
+#Check number of patients enrolled in the Bolsa Familia scholarship
+print (df['Scholarship'].value_counts())
+
+#Check number of scholarship receipients who missed their appointments
+print (df_missed['Scholarship'].value_counts())
+
+#Count number of missed appointments and group by scholarship status
+df_sch_missed =df_missed.groupby('Scholarship')['NoShow'].count()
+
+#Count number of appointments attended and group by scholarship status
+df_sch_attend = df_showedup.groupby('Scholarship')['NoShow'].count()
+
+#define the scholarship status labels
+sch_values=['Not Enrolled', 'Enrolled']
+#plt.bar(sch_values,df_sch_missed, wth);
+
+#Define position of the bars
+bar1_psn=np.arange(len(sch_values))
+bar2_psn=[i+wth for i in bar1_psn]
+
+#plot the bar charts
+plt.bar(bar1_psn,df_sch_attend,wth,label="showed up");
+plt.bar(bar2_psn,df_sch_missed,wth,label="missed");
+
+#change the x-axis label to the scholarship status values and position it at the center
+plt.xticks(bar1_psn+wth/2,sch_values)
+
+#show the legend
+plt.legend();
+
+#add axis labels and title
+plt.title("Patients' appointment attendance based on Scholarship status",weight ='bold')
+plt.xlabel("Scholarship Status", labelpad=15, weight='bold',size=12)
+```
+![image](https://user-images.githubusercontent.com/113180085/201522667-cb27e9a3-3fc0-41bd-8e32-24925cfecd33.png)
+
+## Conclusions
+From the EDA conducted, I was able to conclude that there were relatively less appointments missed. Of the 110527 appointments scheduled, 22319 were missed; which accounts for 20.19% of the appointments scheduled.
+
+Of the over 22000 missed appointments, Jardin Camburi accounts for about 1500 of them. Other neighbourhoods such as Maria Ortiz, Itarare, Resistencia, Cemtro, etc also account for the highest numbers of these missed appointments.
+
+Out of 81 distinct locations, 80 of them have recorded instances of missed appointments. Unfortunately, there isn't additional data such as the ease of accessing the hospital, service delivery rating, etc to ascertain if missing appointments is influenced by the hospital service or the patient's ease of accessing the hospital.
+I also noticed that majority of the patients are females, however both males and females fairly miss and attend appointments. As such it is not easy to conclude if the gender of the patient has any influence of them showing up for the appointment.
+
+Also, with the availability of the Bolsa Familia welfare program, I noticed that majority of the patients are not enrolled. Unfortunately there isn't enough information to determine why there are few enrolled on the program or if there are any special criteria for it. I noticed, however, that enrolment in the scholarship doesn't have much of an impact on attendance either. In fact of the may patients not enrolled in the program, majority of them attend their appointments.
