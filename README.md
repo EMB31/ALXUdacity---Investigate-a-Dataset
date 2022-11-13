@@ -37,7 +37,7 @@ df = pd.read_csv('noshowappointments.csv')
 df.head()
 ```
 
-As part of cleaning the data I checked for the following using the info method
+In order to clean data i first assessed it using the info method to check for
 - null values
 - datatypes of the various columns
 - column naming errors
@@ -64,6 +64,12 @@ No-show           110527 non-null object
 dtypes: float64(1), int64(8), object(5)
 memory usage: 11.8+ MB
 ```
+There were no null values in this dataset. 
+However, the PatientId column is a float, and will be changed to an integer value in a subsequent cell since it is an Id number.
+The ScheduledDay and AppointmentDay columns will also be converted to datetime columns.
+
+The 'Handcap' and 'Hipertension' columns will be renamed because they are incorrectly spelt. 
+The No-show column will be renamed for consistency and ease of use.
 
 Other relevant methods were used to check for duplicate values, amongst others.
 ```
@@ -71,5 +77,83 @@ sum(df.duplicated())
 0
 
 df.describe()
-<img>https://github.com/EMB31/ALXUdacity---Investigate-a-Dataset/blob/main/Capture.PNG</img>
 ```
+![image](https://user-images.githubusercontent.com/113180085/201521486-e9bfdc7a-634d-4b0c-82f0-8e54ae032735.png)
+
+There were no null values in the dataset. However the minimum age was a negative value which had to be corrected.
+
+### Rectifying issues observed
+```
+# Convert PatientId to an integer
+# int64 is specified to prevent Id number from being cut off
+df['PatientId'] =df['PatientId'].astype('int64')
+
+#Convert SceduledDay and AppointmentDay to datetime columns
+df['ScheduledDay'] =pd.to_datetime(df['ScheduledDay'])
+df['AppointmentDay'] =pd.to_datetime(df['AppointmentDay'])
+
+#Change column names
+NewNames = {'Hipertension':'Hypertension','Handcap':'Handicap','No-show':'NoShow'}
+df= df.rename(columns = NewNames)
+
+#Convert age column to positive values only
+df['Age'] = df['Age'].abs()
+```
+The info and describe methods were used again to confirm that the changes have taken effect.
+
+```
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 110527 entries, 0 to 110526
+Data columns (total 14 columns):
+PatientId         110527 non-null int64
+AppointmentID     110527 non-null int64
+Gender            110527 non-null object
+ScheduledDay      110527 non-null datetime64[ns]
+AppointmentDay    110527 non-null datetime64[ns]
+Age               110527 non-null int64
+Neighbourhood     110527 non-null object
+Scholarship       110527 non-null int64
+Hypertension      110527 non-null int64
+Diabetes          110527 non-null int64
+Alcoholism        110527 non-null int64
+Handicap          110527 non-null int64
+SMS_received      110527 non-null int64
+NoShow            110527 non-null object
+dtypes: datetime64[ns](2), int64(9), object(3)
+memory usage: 11.8+ MB
+
+df['Age'].describe()
+count    110527.000000
+mean         37.088892
+std          23.110176
+min           0.000000
+25%          18.000000
+50%          37.000000
+75%          55.000000
+max         115.000000
+Name: Age, dtype: float64
+```
+
+The SMS_received column was dropped because its purpose was unclear.
+```
+del df['SMS_received']
+```
+
+## Exploratory Data Analysis
+
+### Are there more cases of no shows against show ups?
+```
+#Display value counts of the noshow column
+CntOfNoShowVal = df['NoShow'].value_counts()
+
+#Use the plot function to create a pie chart
+#The label attribute is to remove the default label appended to the chart
+#The explode attribute is used to separate the sections from each other
+#autopct was used to show the percentage values to 2 decimal places
+chart = CntOfNoShowVal.plot(kind = 'pie', figsize = (6,6),label=' ', explode=[0,0.2], autopct='%1.2f%%');
+
+#Add a title
+chart.set_title("Ratio of show ups to no shows", weight='bold');
+```
+![image](https://user-images.githubusercontent.com/113180085/201522142-e7f322ed-4aef-4614-810c-6d821d973182.png)
