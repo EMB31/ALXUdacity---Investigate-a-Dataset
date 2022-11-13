@@ -71,6 +71,5 @@ sum(df.duplicated())
 0
 
 df.describe()
-![image](https://user-images.githubusercontent.com/113180085/201521086-282ffaa0-ab4f-48e3-b399-033951c340e4.png)
-
+<img>https://github.com/EMB31/ALXUdacity---Investigate-a-Dataset/blob/main/Capture.PNG</img>
 ```
