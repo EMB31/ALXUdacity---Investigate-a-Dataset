@@ -2,6 +2,14 @@
 My first python project was an introduction to data analysis using python. 
 For this project, i had to learn to wrangle data, perform exploratory Data analysis and draw conclusions from analysis done.
 
+## Table of Contents
+
+* [Introduction](#introduction)
+* [Data Cleaning](#data-cleaning)
+* [Exploratory Data Analysis](#exploratory-data-analysis)
+* [Conclusions](#conclusions)
+
+
 ## Introduction
 The dataset used for the project was the No Show Appointments dataset. This dataset contains information about some 100,000 medical appointment schedules across different hospitals in Brazil and whether the patient showed up for said appointment. The dataset contains the following columns:
 - **PatientId** - the Patients's ID number
